@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Your Energy Consumption and Other Metrics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            color: #333;
+            font-size: 2.5rem;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1.1em;
+            margin-top: 10px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .chart-container {
+            max-width: 1000px; /* Adjust this value for larger graphs */
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            width: 100% !important;  /* Ensures the canvas spans the full width of the container */
+            height: 400px !important; /* Adjust height for bigger/smaller graphs */
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <h1>Compare Your Energy Consumption and Other Metrics</h1>
+
+    <!-- Appliance-Specific Usage -->
+    <form method="POST" action="/graphs">
+        <label for="ac_power">AC Power (in Watts):</label>
+        <input type="number" id="ac_power" name="ac_power" placeholder="Enter AC power">
+
+        <label for="ac_hours">AC Usage Time (in Hours/Day):</label>
+        <input type="number" id="ac_hours" name="ac_hours" placeholder="Enter AC usage time">
+
+        <label for="fan_power">Fan Power (in Watts):</label>
+        <input type="number" id="fan_power" name="fan_power" placeholder="Enter Fan power">
+
+        <label for="fan_hours">Fan Usage Time (in Hours/Day):</label>
+        <input type="number" id="fan_hours" name="fan_hours" placeholder="Enter Fan usage time">
+
+        <label for="lights_power">Lights Power (in Watts):</label>
+        <input type="number" id="lights_power" name="lights_power" placeholder="Enter Lights power">
+
+        <label for="lights_hours">Lights Usage Time (in Hours/Day):</label>
+        <input type="number" id="lights_hours" name="lights_hours" placeholder="Enter Lights usage time">
+
+        <label for="tv_power">TV Power (in Watts):</label>
+        <input type="number" id="tv_power" name="tv_power" placeholder="Enter TV power">
+
+        <label for="tv_hours">TV Usage Time (in Hours/Day):</label>
+        <input type="number" id="tv_hours" name="tv_hours" placeholder="Enter TV usage time">
+
+        <label for="washing_power">Washing Machine Power (in Watts):</label>
+        <input type="number" id="washing_power" name="washing_power" placeholder="Enter Washing Machine power">
+
+        <label for="washing_hours">Washing Machine Usage Time (in Hours/Day):</label>
+        <input type="number" id="washing_hours" name="washing_hours" placeholder="Enter Washing Machine usage time">
+
+        <!-- Country Dropdown -->
+        <label for="country">Select Your Country:</label>
+        <select id="country" name="country" required>
+            <option value="oman">Oman</option>
+            <option value="india">India</option>
+            <option value="uk">United Kingdom</option>
+            <option value="usa">USA</option>
+            <option value="china">China</option>
+            <option value="france">France</option>
+            <option value="germany">Germany</option>
+            <option value="australia">Australia</option>
+            <option value="brazil">Brazil</option>
+        </select>
+
+        <button type="submit">Update Graphs</button>
+    </form>
+
+    <div class="chart-container">
+        <h2>Energy Consumption Comparison (kWh/day)</h2>
+        <canvas id="consumptionChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Carbon Intensity Comparison (gCO₂/kWh)</h2>
+        <canvas id="carbonChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Cost Comparison (USD/day)</h2>
+        <canvas id="costChart"></canvas>
+    </div>
+
+    {% if energy %}
+    <script>
+        // Energy Consumption Chart
+        var consumptionCtx = document.getElementById('consumptionChart').getContext('2d');
+        var consumptionChart = new Chart(consumptionCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Your Consumption', 'Healthy Consumption', 'Normal Consumption'],
+                datasets: [{
+                    label: 'Energy Consumption (kWh/day)',
+                    data: [{{ energy }}, {{ healthy }}, {{ normal }}],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Carbon Intensity Chart
+        var carbonCtx = document.getElementById('carbonChart').getContext('2d');
+        var carbonChart = new Chart(carbonCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Your Carbon Intensity', 'Healthy Intensity', 'Normal Intensity'],
+                datasets: [{
+                    label: 'Carbon Intensity (gCO₂/kWh)',
+                    data: [{{ carbon }}, 150, 200],  // Healthy and normal values can be adjusted
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Cost Comparison Chart
+        var costCtx = document.getElementById('costChart').getContext('2d');
+        var costChart = new Chart(costCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Your Cost', 'Average Cost', 'Global Cost'],
+                datasets: [{
+                    label: 'Cost (USD/day)',
+                    data: [{{ cost }}, 5, 7],  // Average and global values can be adjusted
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+    {% endif %}
+
+</body>
+</html>
+

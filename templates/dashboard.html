@@ -1,0 +1,195 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1, h2 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-complete {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .points {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <h1>Welcome, {{ session['username'] }}</h1>
+
+    <div class="points">
+        Total Points: {{ total_points }}
+    </div>
+
+    <h2>Your Accepted Energy-Saving Challenges</h2>
+<ul>
+    {% for challenge in challenges %}
+        <li>
+            {{ challenge.description }} - Reward: {{ challenge.reward }} points
+            <button onclick="completeChallenge({{ challenge.id }})">Complete</button>
+        </li>
+    {% endfor %}
+</ul>
+
+<script>
+function completeChallenge(challengeId) {
+    // Send a POST request to mark the challenge as completed
+    fetch(`/complete_challenge/${challengeId}`, {
+        method: 'POST',  // Use POST method
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (response.ok) {
+            // Successfully completed the challenge
+            // Remove the challenge from the list
+            window.location.reload()
+            document.getElementById(`challenge-${challengeId}`).remove();
+            
+            // Optionally, reload the page or dynamically update the UI
+        } else {
+            console.log("Failed to complete the challenge");
+        }
+    }).catch(error => {
+        console.error("Error:", error);
+    });
+}
+</script>
+
+
+<h2>Completed Challenges</h2>
+    <ul id="completed-challenges-list">
+        <!-- Completed challenges will be dynamically added here -->
+    </ul>
+
+
+
+
+    <script>
+<ul id="accepted-challenges-list">
+    {% for challenge in challenges %}
+        <li id="challenge-{{ challenge.id }}">
+            {{ challenge.description }} - Reward: {{ challenge.reward }} points
+            <button onclick="completeChallenge({{ challenge.id }})">Complete</button>
+        </li>
+    {% endfor %}
+</ul>
+
+        let totalPoints = 0;
+
+        function loadAcceptedChallenges() {
+            const acceptedList = document.getElementById('accepted-challenges-list');
+            const completedList = document.getElementById('completed-challenges-list');
+            acceptedList.innerHTML = ''; // Clear current list
+            completedList.innerHTML = ''; // Clear completed challenges list
+
+            // Load accepted challenges from localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('challenge_')) {
+                    const challenge = JSON.parse(localStorage.getItem(key));
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        ${challenge.description} - Reward: ${challenge.reward}
+                        <button class="btn-complete" onclick="completeChallenge('${key}')">Complete</button>
+                    `;
+                    acceptedList.appendChild(li);
+                }
+            }
+
+            // Load completed challenges from localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('completed_')) {
+                    const challenge = JSON.parse(localStorage.getItem(key));
+                    const li = document.createElement('li');
+                    li.textContent = `${challenge.description} - Reward: ${challenge.reward}`;
+                    completedList.appendChild(li);
+
+                    // Add points for completed challenges
+                    totalPoints += parseInt(challenge.reward.split(' ')[0]);
+                }
+            }
+
+            // Update total points
+            document.getElementById('total-points').textContent = totalPoints;
+        }
+
+function completeChallenge(challengeId) {
+    // Send request to mark the challenge as completed
+    fetch(`/complete_challenge/${challengeId}`, {
+        method: 'POST',  // Ensure the method is POST
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (response.ok) {
+            // Remove the completed challenge from the active list
+            document.getElementById(`challenge-${challengeId}`).remove();
+
+            // Optionally, you can add it to the "Completed Challenges" section here
+            fetch(`/get_challenge_data/${challengeId}`, {  // Fetch challenge details (optional)
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(resp => resp.json())
+            .then(challenge => {
+                const completedList = document.getElementById('completed-challenges-list');
+                const li = document.createElement('li');
+                li.textContent = `${challenge.description} - Completed!`;
+                completedList.appendChild(li);
+            });
+        } else {
+            console.log("Failed to complete the challenge");
+        }
+    }).catch(error => {
+        console.error("Error:", error);
+    });
+}
+
+
+
+
+
+        window.onload = loadAcceptedChallenges;
+    </script>
+
+    <a href="/logout" class="btn btn-danger">Logout</a>
+</body>
+</html>
+

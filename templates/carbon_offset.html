@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Offset Tracker</title>
+</head>
+<body>
+
+    <h2>Carbon Offset Through Walking</h2>
+
+    <!-- Display Step Count and Carbon Offset -->
+    <div>
+        <p>Steps Walked: <span id="stepCount">0</span></p>
+        <p>Carbon Offset (kg CO₂): <span id="carbonOffset">0</span></p>
+    </div>
+
+    <!-- Button to Start Tracking -->
+    <button onclick="startTracking()">Start Tracking Steps</button>
+
+    <!-- Include the JavaScript for tracking -->
+    <script>
+        let steps = 0;
+        let lastAcceleration = null;
+
+        // Function to detect steps via motion sensor
+        function detectMovement(event) {
+            let acc = event.accelerationIncludingGravity;
+
+            if (lastAcceleration) {
+                let deltaX = Math.abs(acc.x - lastAcceleration.x);
+                let deltaY = Math.abs(acc.y - lastAcceleration.y);
+                let deltaZ = Math.abs(acc.z - lastAcceleration.z);
+
+                if (deltaX + deltaY + deltaZ > 1.5) {
+                    steps++;
+                    document.getElementById('stepCount').innerText = steps;
+                    updateCarbonOffset();
+                }
+            }
+            lastAcceleration = acc;
+        }
+
+        function startTracking() {
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', detectMovement);
+                console.log('Step tracking started');
+            } else {
+                alert('DeviceMotionEvent is not supported on this device.');
+            }
+        }
+
+        // Update the carbon offset based on the steps
+        function updateCarbonOffset() {
+            let stepLength = 0.78; // Average step length in meters
+            let carbonPerKm = 0.2;  // CO2 offset per kilometer in kg
+            let distanceWalked = (steps * stepLength) / 1000; // in kilometers
+            let carbonOffset = distanceWalked * carbonPerKm;
+            document.getElementById('carbonOffset').innerText = carbonOffset.toFixed(3);
+        }
+    </script>
+
+</body>
+</html>

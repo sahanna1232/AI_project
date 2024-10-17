@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classify Waste</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}  <!-- Include the navbar -->
+
+    <div class="container">
+        <h2>Classify Waste</h2>
+        <p>Upload an image to classify the type of waste.</p>
+
+        <form action="/classify_waste" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="image">Upload Waste Image:</label>
+                <input type="file" id="file" name="file" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Classify</button>
+        </form>
+
+        {% if result %}
+            <div class="alert alert-info mt-4">
+            
+                <strong>Classification Result: </strong> {{ result }}
+            </div>
+        {% endif %}
+
+</body>
+</html>

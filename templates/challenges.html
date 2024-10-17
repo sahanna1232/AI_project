@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy-Saving Challenges</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h3 {
+            text-align: center;
+            color: #333;
+        }
+
+        .challenge {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .btn {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn.decline {
+            background-color: #dc3545;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Energy-Saving Challenges</h1>
+        <div id="challenges-list">
+            <!-- Challenges will be dynamically added here -->
+        </div>
+        <h3 id="no-more-challenges" style="display:none;">No more challenges at the moment!</h3>
+    </div>
+
+    <script>
+        const challenges = [
+            { id: 1, description: "Turn off lights when not in use", reward: "10 points" },
+            { id: 2, description: "Reduce AC usage by 1 hour daily", reward: "15 points" },
+            { id: 3, description: "Switch to energy-efficient bulbs", reward: "20 points" },
+            { id: 4, description: "Unplug unused electronics", reward: "5 points" },
+            { id: 5, description: "Use eco-mode on washing machine", reward: "25 points" },
+            { id: 6, description: "Limit TV usage to 2 hours daily", reward: "8 points" },
+            { id: 7, description: "Walk instead of driving short distances", reward: "12 points" },
+            { id: 8, description: "Use natural light during the day", reward: "6 points" },
+            { id: 9, description: "Cook with a pressure cooker", reward: "18 points" },
+            { id: 10, description: "Take shorter showers", reward: "7 points" }
+        ];
+
+        let availableChallenges = [...challenges];
+        let activeChallenges = [];
+        const maxDisplayed = 4;
+
+        function loadChallenges() {
+            const list = document.getElementById('challenges-list');
+            list.innerHTML = ''; // Clear current list
+
+            if (availableChallenges.length === 0 && activeChallenges.length === 0) {
+                document.getElementById('no-more-challenges').style.display = 'block';
+                return;
+            }
+
+            // Display 4 challenges
+            while (activeChallenges.length < maxDisplayed && availableChallenges.length > 0) {
+                const newChallenge = availableChallenges.shift();
+                activeChallenges.push(newChallenge);
+            }
+
+            activeChallenges.forEach((challenge, index) => {
+                const div = document.createElement('div');
+                div.classList.add('challenge');
+                div.innerHTML = `
+                    <p>${challenge.description} - Reward: ${challenge.reward}</p>
+                    <button class="btn accept" onclick="acceptChallenge(${index})">Accept</button>
+                    <button class="btn decline" onclick="declineChallenge(${index})">Decline</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+function acceptChallenge(index) {
+    const selectedChallenge = activeChallenges.splice(index, 1)[0]; // Remove accepted challenge from UI list
+
+    // Send accepted challenge to the server
+    fetch(`/accept_challenge/${selectedChallenge.id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(selectedChallenge)  // Send challenge data
+    }).then(response => {
+        if (response.ok) {
+            // Reload the challenge list without the accepted challenge
+            loadChallenges(); 
+
+            // Delay redirect to give time for UI updates
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 500);
+        } else {
+            console.log("Error accepting the challenge");
+        }
+    }).catch(error => {
+        console.error("Error:", error);
+    });
+}
+
+
+
+
+
+        function declineChallenge(index) {
+            activeChallenges.splice(index, 1); // Remove the declined challenge
+            loadChallenges(); // Load the next one if available
+        }
+
+        window.onload = loadChallenges;
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+﻿Appliance,Power (Watts),Usage Time (Hours/Day),Estimated kWh (per day)
+Air Conditioner,2000,8,16
+Refrigerator,150,24,3.6
+Washing Machine,500,1,0.5
+TV,100,5,0.5
+Lights,60,6,0.36

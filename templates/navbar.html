@@ -1,0 +1,68 @@
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #f8f9fa;">
+    <a class="navbar-brand" href="#" style="font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #212529;">Energy Estimator</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/" style="color: #212529; font-family: 'Roboto', sans-serif;">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/savings" style="color: #212529;">Savings Calculator</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/graphs" style="color: #212529;">Compare Graphs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/tips" style="color: #212529;">Personalized Tips</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/sdg" style="color: #212529;">SDG Info</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/challenges" style="color: #212529;">Energy-Saving Challenges</a>
+            </li>
+            <!-- New Signup and Login Links -->
+            <li class="nav-item">
+                <a class="nav-link" href="/signup" style="color: #212529;">Sign Up</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/login" style="color: #212529;">Login</a>
+            </li>
+            <!-- If logged in, show Dashboard and Logout -->
+            {% if session['username'] %}
+            <li class="nav-item">
+                <a class="nav-link" href="/dashboard" style="color: #212529;">Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout" style="color: #212529;">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/find_recycling_centers" style="color: #212529;">Find Recycling Centers</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/classify_waste" style="color: #212529;">Classify Waste</a>  <!-- New Link -->
+      </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/carbon_offset" style="color: #212529;">Carbon Offset Tracker</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<!-- Add Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

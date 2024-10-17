@@ -1,0 +1,106 @@
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            color: #333;
+            font-size: 2.5rem;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1.1em;
+            margin-top: 10px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+{% include 'navbar.html' %}
+
+
+
+
+    <h1>Estimate Your Energy Consumption and Carbon Footprint</h1>
+
+    <form id="energyForm" method="POST" action="/estimate">
+        <label for="power">Power (in Watts):</label>
+        <input type="number" id="power" name="power" placeholder="Enter power (e.g. 100)" required><br>
+
+        <label for="hours">Usage Time (in Hours/Day):</label>
+        <input type="number" id="hours" name="hours" placeholder="Enter hours per day" required><br>
+
+      <label for="country">Select Your Country:</label>
+<select id="country" name="country">
+    <option value="oman">Oman</option>
+    <option value="india">India</option>
+    <option value="uk">United Kingdom</option>
+    <option value="usa">USA</option>
+    <option value="china">China</option>
+    <option value="france">France</option>
+    <option value="germany">Germany</option>
+    <option value="australia">Australia</option>
+    <option value="brazil">Brazil</option>
+</select>
+<br>
+
+        <button type="submit">Estimate</button>
+    </form>
+
+    {% if energy %}
+        <h2>Estimated Energy Consumption: {{ energy }} kWh/day</h2>
+        <h2>Estimated Carbon Footprint: {{ carbon }} kg CO₂/day</h2>
+        <h2>Estimated Cost: ${{ cost }} USD/day</h2>
+        <p>{{ tips }}</p>
+    {% endif %}
+
+    <a href="/sdg" class="sdg-link">Learn More About SDG 13</a>
+
+</body>
+</html>
+
+
+
