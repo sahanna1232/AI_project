@@ -56,3 +56,4 @@ virtualenv
 Werkzeug
 wheel
 wrapt
+gunicorn
