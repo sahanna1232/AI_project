@@ -12,7 +12,7 @@ from data_loader import load_data
 print(os.getcwd())
 
 # Path to the dataset
-train_dir = r'C:\Users\Sahanna\energy_consumption_project\data'
+train_dir = r'https://github.com/sahanna1232/AI_project/data'
 
 # Load the data
 train_generator, validation_generator = load_data(train_dir, target_size=(224, 224), batch_size=32)
